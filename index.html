@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <title>Jake</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1,  target-densitydpi=device-dpi" />
+        <script src="phaser.js"></script>
+        <script src="game.js"></script>
+        <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+
+        <style>
+        </style> 
+
+
+    </head>
+    <body>
+        <script>
+
+            Jake.gameWidth = window.innerWidth * window.devicePixelRatio;
+            Jake.gameHeight = window.innerHeight * window.devicePixelRatio;
+
+// HORIZONTAL SCROLLING GAMES - The base height you choose to develop the game - will be used to initialize game scaling
+            Jake.devY = 400;
+
+            Jake.game = new Phaser.Game((Jake.devY / Jake.gameHeight) * Jake.gameWidth, Jake.devY, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
+//globaalit muuttujat
+            Jake = {
+                kello: undefined,
+                nickName: undefined,
+                gameWidth: undefined,
+                gameHeight: undefined,
+                devY: undefined
+
+
+
+            };
+
+            function preload() {
+                //ladataan json php tiedosto, joka tuo localhostista top 3 ajat, nopein ensin.
+                 this.game.load.json("jake", 'http://localhost/TietokantaJake/index.php');
+            }
+
+            function create() {
+                //käytän promptia, koska phaser ei tue formeja. Lisätään nimimerkki
+                Jake.nickName = prompt("Congratulations, please enter your name", '');
+//jquery ajaxilla otetaan yhteys php:n avulla kantaan, jonne talletetaan nimimerkki ja lopullinen aika, tässä ei aikaa oteta mistään
+// koska kello-muuttujaa ei ole määritetty timeriin.
+                $.ajax({
+                    url: 'http://localhost/TietokantaJake/getTimes.php',
+                    data: {
+                        'name': Jake.nickName, //tähän tulee nimi muuttuja, mihin käyttäjä pystyy itse keksimään nimen
+                        'time': Jake.kello
+                    }
+                })
+                        .done(function () {
+                            console.log('done');
+                        })
+                        .fail(function () {
+                            console.log('failed');
+                        });
+
+
+
+               
+
+//haetaan ja tulostetaan top 3 ajat
+                this.ykkonen = this.game.cache.getJSON("jake")[0];
+                this.kakkonen = this.game.cache.getJSON("jake")[1];
+                this.kolmonen = this.game.cache.getJSON("jake")[2];
+
+                this.name = this.ykkonen['name'];
+                this.time = this.ykkonen['time'];
+
+                this.name2 = this.kakkonen['name'];
+                this.time2 = this.kakkonen['time'];
+
+                this.name3 = this.kolmonen['name'];
+                this.time3 = this.kolmonen['time'];
+
+
+
+                this.text = this.game.add.text(0, 0, "Nickname: ", {fill: '#fffafa'});
+                this.text = this.game.add.text(200, 0, "TimeTotal: ", {fill: '#fffafa'});
+
+
+
+                this.text = this.game.add.text(0, 50, "1. " + this.name, {fill: '#fffafa'});
+                this.text = this.game.add.text(200, 50, this.time, {fill: '#fffafa'});
+
+
+
+                this.text = this.game.add.text(0, 100, "2. " + this.name2, {fill: '#fffafa'});
+                this.text = this.game.add.text(200, 100, this.time2, {fill: '#fffafa'});
+
+
+                this.text = this.game.add.text(0, 150, "3. " + this.name3, {fill: '#fffafa'});
+                this.text = this.game.add.text(200, 150, this.time3, {fill: '#fffafa'});
+
+            }
+
+            function update() {
+            }
+
+        </script>
+    </body>
+</html>
